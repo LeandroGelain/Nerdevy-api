@@ -1,6 +1,7 @@
-const mysql = require('../../mysql');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+
+const mysql = require('../../mysql');
 
 exports.insert_user = (req, res, next) => {
     mysql.getConnection((err, conn) => {
@@ -13,13 +14,13 @@ exports.insert_user = (req, res, next) => {
                 } else if (results.length > 0) {
                     res.status(500).send({error: "Usuario já cadastrado!"});
                 } else {
-                    bcrypt.hash(req.body.password, 10 , (errBcrypt, hash) => {
+                    bcrypt.hash(req.body.pwd, 10 , (errBcrypt, hash) => {
                         if (err) {
                             res.status(500).send({error: errBcrypt});
                         } else {
                             conn.query(
-                                'insert into Users (email, username, first_name, last_name,pwd, category, institution, points_user)'
-                                + 'values(?,?,?,?,?)', 
+                                `insert into users (email, username, first_name, last_name, pwd, category, institution, points_user)`
+                                + `values(?,?,?,?,?,?,?,?)`, 
                                 [
                                     req.body.email,
                                     req.body.username,
@@ -28,7 +29,7 @@ exports.insert_user = (req, res, next) => {
                                     hash,
                                     req.body.category,
                                     req.body.institution,
-                                    0
+                                    req.body.points
                                 ],
                                 (error, results, fields) => {
                                     conn.release();
@@ -43,7 +44,7 @@ exports.insert_user = (req, res, next) => {
                                             id_user: req.body.id_user
                                         }, 'education_method',{});
                                         res.status(201).send({
-                                            id_user: result.insertId,
+                                            id_user: results.insertId,
                                             token: token
                                         });
                                     }
@@ -85,7 +86,8 @@ exports.login = (req, res, next) => {
                                 email: results[0].email,
                                 first_name: results[0].first_name,
                                 id_user: results[0].id_user,
-                                token: token
+                                token: token,
+                                message: 'Success'
                         });
                     } else {
                         return res.status(401).send({error: 'Falha na autenticação'})

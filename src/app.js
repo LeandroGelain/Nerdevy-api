@@ -1,9 +1,13 @@
+const bodyParser = require('body-parser')
 const express = require('express');
+
 const app = express()
 
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 const login = require('./routes/login_route');
 
-app.use('/login', login);
+app.use('/user', login);
 
 app.use((req, res, next) => {
     const error = new Error("Route not found (404)");
