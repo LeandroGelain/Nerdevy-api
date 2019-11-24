@@ -19,8 +19,8 @@ exports.insert_user = (req, res, next) => {
                             res.status(500).send({error: errBcrypt});
                         } else {
                             conn.query(
-                                `insert into users (email, username, first_name, last_name, pwd, category, institution, points_user)`
-                                + `values(?,?,?,?,?,?,?,?)`, 
+                                `insert into users (email, username, first_name, last_name, pwd, category, institution ,age, city, state, country, points_user)`
+                                + `values(?,?,?,?,?,?,?,?,?,?,?,?)`, 
                                 [
                                     req.body.email,
                                     req.body.username,
@@ -29,7 +29,11 @@ exports.insert_user = (req, res, next) => {
                                     hash,
                                     req.body.category,
                                     req.body.institution,
-                                    req.body.points
+                                    req.body.age,
+                                    req.body.city,
+                                    req.body.state,
+                                    req.body.country,
+                                    0
                                 ],
                                 (error, results, fields) => {
                                     conn.release();
