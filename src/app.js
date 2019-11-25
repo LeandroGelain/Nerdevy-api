@@ -1,11 +1,14 @@
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 const express = require('express');
-
 const app = express()
 
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
+var cors = require('cors');
+app.use(cors())
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 const login = require('./routes/login_route');
+
 
 app.use('/user', login);
 
