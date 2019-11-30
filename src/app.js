@@ -7,9 +7,11 @@ app.use(cors())
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+const card = require('./routes/cards_routes');
 const login = require('./routes/login_route');
 
-
+app.use('/card/', card)
 app.use('/user', login);
 
 app.use((req, res, next) => {
