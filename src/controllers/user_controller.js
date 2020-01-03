@@ -86,10 +86,12 @@ exports.login = (req, res, next) => {
                             first_name: results[0].first_name,
                             id_user: results[0].id_user
                         }, 'education_method',{});
+                        console.log(results[0])
+                        
                         return res.status(200).send({
                                 email: results[0].email,
-                                first_name: results[0].first_name,
-                                id_user: results[0].id_user,
+                                username: results[0].username,
+                                id_user: results[0].id_user,     
                                 token: token,
                                 message: 'Success'
                         });
@@ -100,4 +102,47 @@ exports.login = (req, res, next) => {
             }
         }); 
     });
+}
+
+exports.list = (req, res, next) => {
+    mysql.getConnection((err, conn) => {
+        if (err) {
+            return res.status(500).send({
+                err : err
+            })
+        } else {
+            conn.query(`select * from users`, (error, results, fields) => {
+                if (error) {
+                    return res.status(500).send({ error: error})
+                }
+                else {
+                    return res.status(201).send({ results: results})
+                }
+            })
+        }
+    })
+}
+
+exports.view = (req, res, next) => {
+    mysql.getConnection((err, conn) => {
+        if (err) {
+            return res.status(500).send({
+                err : err
+            })
+        } else {
+            conn.query(`select * from users where email=?`,req.body.email, 
+                (error, results, fields) => {
+                    if (error) {
+                        return res.status(500).send({ error: error})
+                    }
+                    if (results.length === 0) {
+                        return res.status(404).send({ message: 'Usuario não existe'})
+                    }
+                    else {
+                        return res.status(201).send({ results: results})
+                    }
+                }
+            )
+        }
+    })
 }

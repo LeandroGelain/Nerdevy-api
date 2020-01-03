@@ -3,30 +3,41 @@ const mysql = require('../../mysql.js');
 exports.insert_card_challenge = (req, res, next) => {
     mysql.getConnection((err, conn) => {
         if (err) {
-            return res.status(500).send({error: err})}
-        conn.query(
-            `insert into challenges(category_challenge, title, description_challenge, points)`
-            + `values(?,?,?,?)`,
-            [
-                req.body.category,
-                req.body.title,
-                req.body.description,
-                req.body.points,
-            ],
-            (error, results, fields) => {
-                conn.release();
-                if (error) {
-                    res.status(500).send({
-                        error: error
-                    });
-                } else {
-                    res.status(201).send({
-                        message: 'card inserted'
-                    })
-                }
+            return res.status(500).send({error: err})
+        }
+        conn.query(`select * from users where email=?`,[req.body.email],
+        (erro, results, fields) => {
+            if (erro) {
+                return res.status(500).send({ err:err })
+            } 
+            if (results.length < 1) {
+                return res.status(401).send({error: 'Usuario não exite no banco!'})
+            } else {
+                conn.query(
+                    `insert into challenges(category_challenge, title, description_challenge, points, created_by)`
+                    + `values(?,?,?,?,?)`,
+                    [
+                        req.body.category,
+                        req.body.title,
+                        req.body.description,
+                        req.body.points,
+                        req.body.email
+                    ],
+                    (error, results, fields) => {
+                        conn.release();
+                        if (error) {
+                            return res.status(500).send({
+                                error: error
+                            });
+                        } else {
+                            res.status(201).send({
+                                message: 'card inserted'
+                            })
+                        }
+                    }
+                )
             }
-            )
-
+        })        
     })
 }
 
@@ -77,19 +88,34 @@ exports.update_card_challenge = (req, res ,next) => {
     })
 }
 
-exports.get_cards_challage = (req, res, next) => {
+exports.get_cards_challenge = (req, res, next) => {
     mysql.getConnection((err, conn) => {
         if (err) {
-            return res.status(500).send({error: err})}
-        conn.query(
-            `select * from education_project.challenges;`,
-            (error, results) => {
-                if (error) {
-                    res.status(500).send({error: error})
-                } else {
-                    res.status(200).send(results)
+            return res.status(500).send({error: err})
+        }
+        if (req.body.initial_number === 0){
+            conn.query(
+                `select * from challenges;`,
+                (error, results) => {
+                    if (error) {
+                        res.status(500).send({error: error})
+                    } else {
+                        res.status(200).send(results)
+                    }
                 }
+                )
             }
+        if (req.body.initial_number) {
+            conn.query(
+                `select * from challenges limit ?;`,[req.body.initial_number],
+                (error, results) => {
+                    if (error) {
+                        res.status(500).send({error: error})
+                    } else {
+                        res.status(200).send(results)
+                    }
+                }
             )
+        }
     })
 }
