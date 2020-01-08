@@ -46,7 +46,7 @@ exports.delete_card_challenge = (req, res, next) => {
         if (err) {
             return res.status(500).send({error: err})}
         conn.query(
-            `delete challenges from education_project.challenges where idChallenges=`+req.body.idChallenge,
+            `delete challenges from challenges where idChallenges=`+req.body.idChallenge,
         (error, results,fields) =>{
             conn.release();
             if (error) {
@@ -113,6 +113,25 @@ exports.get_cards_challenge = (req, res, next) => {
                         res.status(500).send({error: error})
                     } else {
                         res.status(200).send(results)
+                    }
+                }
+            )
+        }
+    })
+}
+
+exports.get_card_by_id = (req, res, next) => {
+    mysql.getConnection((err,conn) => {
+        if (err) {
+            return res.status(500).send({err:err})
+        } else {
+            conn.query(
+                `select * from challenges where idChallenges=?`,[req.body.idCard],
+                (error, results, fields) => {
+                    if (error) {
+                        res.status(500).send({error: error})
+                    } else {
+                        res.status(200).send(results[0])
                     }
                 }
             )
