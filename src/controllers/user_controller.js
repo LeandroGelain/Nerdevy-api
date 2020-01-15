@@ -86,8 +86,6 @@ exports.login = (req, res, next) => {
                             first_name: results[0].first_name,
                             id_user: results[0].id_user
                         }, 'education_method',{});
-                        console.log(results[0])
-                        
                         return res.status(200).send({
                                 email: results[0].email,
                                 username: results[0].username,
@@ -112,6 +110,7 @@ exports.list = (req, res, next) => {
             })
         } else {
             conn.query(`select * from users`, (error, results, fields) => {
+                conn.release();
                 if (error) {
                     return res.status(500).send({ error: error})
                 }
@@ -132,6 +131,7 @@ exports.view = (req, res, next) => {
         } else {
             conn.query(`select * from users where email=?`,req.body.email, 
                 (error, results, fields) => {
+                    conn.release();
                     if (error) {
                         return res.status(500).send({ error: error})
                     }

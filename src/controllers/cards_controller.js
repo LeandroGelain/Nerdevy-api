@@ -78,6 +78,7 @@ exports.update_card_challenge = (req, res ,next) => {
                 req.body.idChallenge
             ],
             (error, results) => {
+                conn.release();
                 if (error) {
                     res.status(500).send({error: error})
                 } else {
@@ -93,22 +94,11 @@ exports.get_cards_challenge = (req, res, next) => {
         if (err) {
             return res.status(500).send({error: err})
         }
-        if (req.body.initial_number === 0){
-            conn.query(
-                `select * from challenges;`,
-                (error, results) => {
-                    if (error) {
-                        res.status(500).send({error: error})
-                    } else {
-                        res.status(200).send(results)
-                    }
-                }
-                )
-            }
         if (req.body.initial_number) {
             conn.query(
                 `select * from challenges limit ?;`,[req.body.initial_number],
                 (error, results) => {
+                    conn.release();
                     if (error) {
                         res.status(500).send({error: error})
                     } else {
@@ -117,6 +107,19 @@ exports.get_cards_challenge = (req, res, next) => {
                 }
             )
         }
+        if (req.body.initial_number === 0){
+            conn.query(
+                `select * from challenges;`,
+                (error, results) => {
+                    conn.release();
+                    if (error) {
+                        res.status(500).send({error: error})
+                    } else {
+                        res.status(200).send(results)
+                    }
+                }
+                )
+            }
     })
 }
 
@@ -128,6 +131,7 @@ exports.get_card_by_id = (req, res, next) => {
             conn.query(
                 `select * from challenges where idChallenges=?`,[req.body.idCard],
                 (error, results, fields) => {
+                    conn.release();
                     if (error) {
                         res.status(500).send({error: error})
                     } else {
