@@ -1,11 +1,15 @@
 const express = require('express');
-const app = express()
 const morgan = require('morgan')
-
+const mongoose = require('mongoose');
 const card = require('./routes/cards_routes');
-const login = require('./routes/user_route');
-
+const user = require('./routes/user_route');
 var cors = require('cors');
+
+const app = express()
+mongoose.connect('mongodb+srv://LeandroGelain03:M.a.159730@cluster0-j0elh.mongodb.net/appDataBase?retryWrites=true&w=majority', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
 
 app.use(morgan('dev'));
 
@@ -15,7 +19,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 app.use('/card', card)
-app.use('/user', login);
+app.use('/user', user);
 
 
 app.use((req, res, next) => {

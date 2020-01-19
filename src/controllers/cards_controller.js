@@ -1,144 +1,105 @@
-const mysql = require('../../mysql.js');
+const Card = require('../models/Card');
+const User = require('../models/User');
 
-exports.insert_card_challenge = (req, res, next) => {
-    mysql.getConnection((err, conn) => {
-        if (err) {
-            return res.status(500).send({error: err})
-        }
-        conn.query(`select * from users where email=?`,[req.body.email],
-        (erro, results, fields) => {
-            if (erro) {
-                return res.status(500).send({ err:err })
-            } 
-            if (results.length < 1) {
-                return res.status(401).send({error: 'Usuario não exite no banco!'})
+module.exports = {
+    async store(req, res) {
+        const { title, category, points, description, email } = req.body;
+        const  emailUser  = await User.findOne({email})
+        if(emailUser){
+            if (emailUser.email === email){
+                const cards = await Card.create({
+                    title,
+                    category,
+                    points,
+                    description,
+                    created_by: email,
+                    members : []
+                })
+                return res.status(200).send({message : `Card ${title} inserido`})
             } else {
-                conn.query(
-                    `insert into challenges(category_challenge, title, description_challenge, points, created_by)`
-                    + `values(?,?,?,?,?)`,
-                    [
-                        req.body.category,
-                        req.body.title,
-                        req.body.description,
-                        req.body.points,
-                        req.body.email
-                    ],
-                    (error, results, fields) => {
-                        conn.release();
-                        if (error) {
-                            return res.status(500).send({
-                                error: error
-                            });
-                        } else {
-                            res.status(201).send({
-                                message: 'card inserted'
-                            })
-                        }
-                    }
-                )
-            }
-        })        
-    })
-}
-
-exports.delete_card_challenge = (req, res, next) => {
-    mysql.getConnection((err, conn ) => {
-        if (err) {
-            return res.status(500).send({error: err})}
-        conn.query(
-            `delete challenges from challenges where idChallenges=`+req.body.idChallenge,
-        (error, results,fields) =>{
-            conn.release();
-            if (error) {
-                res.status(500).send({error: error})
-            } else {
-                res.status(201).send({message: 'card delete'})
+                return res.status(404).send({message : "Usuario não encontrado"})
             }
         }
-        )
-    })
-}
-
-exports.update_card_challenge = (req, res ,next) => {
-    mysql.getConnection((err, conn) => {
-        if (err) {
-            return res.status(500).send({error: err})}
-        conn.query(
-            `update education_project.challenges 
-                set category_challenge=?, 
-                title= ?, 
-                description_challenge=?,
-                points=?
-                where idChallenges=?; `,
-            [
-                req.body.category,
-                req.body.title,
-                req.body.description,
-                req.body.points,
-                req.body.idChallenge
-            ],
-            (error, results) => {
-                conn.release();
-                if (error) {
-                    res.status(500).send({error: error})
-                } else {
-                    res.status(201).send({message: "card updated"})
-                }
-            }
-        )
-    })
-}
-
-exports.get_cards_challenge = (req, res, next) => {
-    mysql.getConnection((err, conn) => {
-        if (err) {
-            return res.status(500).send({error: err})
+    },
+    async index (req, res){
+        const { initial_number } = req.body;
+        if (initial_number === 0) {
+            const cardsList = await Card.find()
+            return res.status(200).send(cardsList)
         }
-        if (req.body.initial_number) {
-            conn.query(
-                `select * from challenges limit ?;`,[req.body.initial_number],
-                (error, results) => {
-                    conn.release();
-                    if (error) {
-                        res.status(500).send({error: error})
-                    } else {
-                        res.status(200).send(results)
-                    }
-                }
-            )
+        if (initial_number) {
+            const cardsList = await Card.find().limit(initial_number)
+            return res.status(200).send(cardsList)
         }
-        if (req.body.initial_number === 0){
-            conn.query(
-                `select * from challenges;`,
-                (error, results) => {
-                    conn.release();
-                    if (error) {
-                        res.status(500).send({error: error})
-                    } else {
-                        res.status(200).send(results)
-                    }
-                }
-                )
+    },
+    async delete(req, res) {
+        const { idCard } = req.body;
+        if ( idCard ) {
+            const consultCard = await Card.findOne({"_id": idCard })
+            if (consultCard) {
+                const cardDeleted = await Card.deleteOne({"_id": idCard})
+                return res.status(200).send({message : `card deletado!`})
             }
-    })
-}
-
-exports.get_card_by_id = (req, res, next) => {
-    mysql.getConnection((err,conn) => {
-        if (err) {
-            return res.status(500).send({err:err})
+            return res.status(404).send({message: "Card não encontrado"})
         } else {
-            conn.query(
-                `select * from challenges where idChallenges=?`,[req.body.idCard],
-                (error, results, fields) => {
-                    conn.release();
-                    if (error) {
-                        res.status(500).send({error: error})
-                    } else {
-                        res.status(200).send(results[0])
-                    }
-                }
-            )
+            return res.status(500).send({message: 'error body'})
         }
-    })
+    },
+    async update(req, res) {
+        const { idCard, 
+            title = oldCard.title,
+            category = oldCard.category,
+            description = oldCard.description,
+            points = oldCard.points,
+            members,
+            email = oldCard.email} = req.body;
+        const oldCard = await Card.findOne({"_id":idCard})
+        if(oldCard) {
+            members.map( member => oldCard.members.push(member))
+            console.log(oldCard.members)
+            if (oldCard.members.length !== 0){
+                const newCard = Card.updateOne(
+                    {_id:idCard}, {$set:{title:title,
+                        category:category,
+                        description:description,
+                        points:points,
+                        members:oldCard.members,
+                        email:email}}, {new:true}, (err, doc)=> {
+                        if (err) {
+                            return res.status(500).send({err:err})
+                        }
+                        return res.status(200).send({message:"Sucesso ao editar."})
+                    }
+                )
+            } else {
+                const newCard = Card.updateOne(
+                    {_id:idCard}, {$set:{title:title,
+                        category:category,
+                        description:description,
+                        points:points,
+                        members:members,
+                        email:email}}, {new:true}, (err, doc)=> {
+                        if (err) {
+                            return res.status(500).send({err:err})
+                        }
+                        return res.status(200).send({message:"Sucesso ao editar."})
+                    }
+                )
+            }
+        } else {
+            return res.status(404).send({message:'Card não encontrado.',card: oldCard})
+        }
+    },
+    async show(req,res) {
+        const { idCard } = req.body
+        await Card.findOne({"_id":idCard}, (err, response) => {
+            if(err) {
+                return res.status(500).send({message:err})
+            } 
+            else {
+                return res.status(200).send(response)
+            }
+        })
+    }
+
 }
