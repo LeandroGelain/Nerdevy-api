@@ -3,10 +3,15 @@ const morgan = require('morgan')
 const mongoose = require('mongoose');
 const card = require('./routes/cards_routes');
 const user = require('./routes/user_route');
+
+const dotenv = require('dotenv')
+dotenv.config()
+
 var cors = require('cors');
 
+
 const app = express()
-mongoose.connect('mongodb+srv://LeandroGelain03:M.a.159730@cluster0-j0elh.mongodb.net/appDataBase?retryWrites=true&w=majority', {
+mongoose.connect(`mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@cluster0-j0elh.mongodb.net/appDataBase?retryWrites=true&w=majority`, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
