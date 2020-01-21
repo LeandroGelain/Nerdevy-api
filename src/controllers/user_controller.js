@@ -79,29 +79,5 @@ module.exports = {
         } else {
             return res.status(201).send(userData)
         }
-    }
-}
-exports.view = (req, res, next) => {
-    mysql.getConnection((err, conn) => {
-        if (err) {
-            return res.status(500).send({
-                err : err
-            })
-        } else {
-            conn.query(`select * from users where email=?`,req.body.email, 
-                (error, results, fields) => {
-                    conn.release();
-                    if (error) {
-                        return res.status(500).send({ error: error})
-                    }
-                    if (results.length === 0) {
-                        return res.status(404).send({ message: 'Usuario não existe'})
-                    }
-                    else {
-                        return res.status(201).send({ results: results})
-                    }
-                }
-            )
-        }
-    })
+    },
 }

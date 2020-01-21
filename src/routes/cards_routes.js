@@ -8,5 +8,6 @@ router.post('/update', CardsController.update);
 router.post('/listLimit', CardsController.index);
 router.post('/findById', CardsController.show);
 router.post('/insertMember', CardsController.insertMember);
+router.post('/removeMember', CardsController.removeMember);
 
 module.exports = router;

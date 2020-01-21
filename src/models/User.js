@@ -16,7 +16,8 @@ const UserSchema = new mongoose.Schema({
     created_date: {
         type:Date,
         default:Date.now()
-    }
+    },
+    friends:[String]
 })
 
 module.exports = mongoose.model('User',UserSchema);

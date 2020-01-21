@@ -126,5 +126,35 @@ module.exports = {
         } else {
             return res.status(404).send({message: "Card não encontrado"})
         } 
-    } 
+    },
+    async removeMember(req, res) {
+        const { email, idCard } = req.body;
+        const oldCard = await Card.findOne({"_id":idCard})
+        const oldCardList = oldCard.members.slice()
+        if (oldCard) {
+            for (const x in  oldCard.members){
+                if (email === oldCard.members[parseInt(x)]){
+                    oldCard.members.splice(oldCard.members.indexOf(email),1)
+                }
+            }
+            if (oldCardList.length === oldCard.members.length ) {
+                return res.status(200).send({message:"Membro não estava no card."})
+            }   
+            await Card.updateOne({"_id":idCard}, 
+                {
+                    $set:{
+                        members: oldCard.members,
+                    }
+                }, (err, response)=> {
+                    if (err) {
+                        return res.status(500).send({err:err})
+                    } else {
+                        return res.status(200).send({message:"Membro removido."})
+                    }
+                }
+            );
+        } else {
+            return res.status(404).send({message: "Card não encontrado"})
+        } 
+    }  
 }        
