@@ -7,5 +7,6 @@ router.post("/delete",CardsController.delete);
 router.post('/update', CardsController.update);
 router.post('/listLimit', CardsController.index);
 router.post('/findById', CardsController.show);
+router.post('/insertMember', CardsController.insertMember);
 
 module.exports = router;
