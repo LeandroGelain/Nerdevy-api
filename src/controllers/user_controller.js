@@ -13,7 +13,7 @@ module.exports = {
                 } else {
                     user =  User.create({
                         email,
-                        username,
+                        username:`@${username}`,
                         first_name,
                         last_name,
                         pwd: hash,
@@ -69,7 +69,7 @@ module.exports = {
     },
     async index (req, res) {
         const Users = await User.find({})
-        return res.json(Users)
+        return res.status(200).json(Users)
     },
     async show (req, res) {
         const { email } = req.body;

@@ -17,7 +17,15 @@ const UserSchema = new mongoose.Schema({
         type:Date,
         default:Date.now()
     },
-    friends:[String]
+    // adicionar esses campos que não tinha previsto
+    friends:[String],
+    img: {
+        data: Buffer,
+        contentType: String
+    },
+    bio: String,
+    gitLabProfile:String,
+    githubProfile:String
 })
 
 module.exports = mongoose.model('User',UserSchema);

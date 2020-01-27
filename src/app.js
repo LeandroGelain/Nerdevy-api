@@ -3,6 +3,7 @@ const morgan = require('morgan')
 const mongoose = require('mongoose');
 const card = require('./routes/cards_routes');
 const user = require('./routes/user_route');
+const friends = require('./routes/friendRoute');
 
 const dotenv = require('dotenv')
 dotenv.config()
@@ -23,9 +24,9 @@ app.use(cors())
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-app.use('/card', card)
+app.use('/card', card);
 app.use('/user', user);
-
+app.use('/friends', friends);
 
 app.use((req, res, next) => {
     const error = new Error("Route not found (404)");

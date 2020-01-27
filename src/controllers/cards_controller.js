@@ -27,10 +27,8 @@ module.exports = {
             const cardsList = await Card.find()
             return res.status(200).send(cardsList)
         }
-        if (initial_number) {
-            const cardsList = await Card.find().limit(initial_number)
-            return res.status(200).send(cardsList)
-        }
+        const cardsList = await Card.find().limit(initial_number)
+        return res.status(200).send(cardsList)
     },
     async delete(req, res) {
         const { idCard } = req.body;
