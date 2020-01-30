@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan')
 const mongoose = require('mongoose');
+
 const card = require('./routes/cards_routes');
 const user = require('./routes/user_route');
 const friends = require('./routes/friendRoute');
@@ -10,7 +11,6 @@ dotenv.config()
 
 var cors = require('cors');
 
-
 const app = express()
 mongoose.connect(`mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@cluster0-j0elh.mongodb.net/appDataBase?retryWrites=true&w=majority`, {
     useNewUrlParser: true,
@@ -19,13 +19,14 @@ mongoose.connect(`mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@clus
 
 app.use(morgan('dev'));
 
-app.use(cors())
+app.use(cors()) 
 
+app.use("/uploads",express.static('uploads'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 app.use('/card', card);
-app.use('/user', user);
+app.use('/user', user); 
 app.use('/friends', friends);
 
 app.use((req, res, next) => {

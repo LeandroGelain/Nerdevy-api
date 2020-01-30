@@ -1,17 +1,19 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const multer = require('multer');
 
 module.exports = {
     async store (req, res, next) {
         const {email, username, first_name, last_name, pwd, category, institution, born_date, state, city, country, points_user = 0 } = req.body;
-        let user = await User.findOne({ email });
-        if(!user){
+        let user_email = await User.findOne({ email });
+        let user_name = await User.findOne({ username });
+        if(!user_email && !user_name){
             await bcrypt.hash(pwd, 10 , (errBcrypt, hash) => {
                 if (errBcrypt) {
                     res.status(500).send({error: errBcrypt});
                 } else {
-                    user =  User.create({
+                    user = User.create({
                         email,
                         username:`@${username}`,
                         first_name,
@@ -80,4 +82,74 @@ module.exports = {
             return res.status(201).send(userData)
         }
     },
+    async edit (req, res) {
+        const { OldEmail, email, first_name, last_name, pwd, category, institution, born_date, state, city, country} = req.body;
+        if (pwd !== null && pwd !== '') {
+            await bcrypt.hash(pwd, 10 , (errBcrypt, hash) => {
+                if (errBcrypt) {
+                    res.status(500).send({error: errBcrypt});
+                } else {
+                    User.updateOne({email:OldEmail},{$set:{
+                        email,
+                        first_name,
+                        last_name,
+                        pwd: hash,
+                        category,
+                        institution,
+                        born_date,
+                        state,
+                        city,
+                        country
+                    }},(err, response) => {
+                        if(err){
+                            return res.status(500).send({error:err})
+                        } return res.status(200).send(response)
+                    })
+                }
+            })
+        } if (req.body.path_img && pwd !== null && pwd !== ''){
+            await bcrypt.hash(pwd, 10 , (errBcrypt, hash) => {
+                if (errBcrypt) {
+                    res.status(500).send({error: errBcrypt});
+                } else {
+                    User.updateOne({email:OldEmail},{$set:{
+                        email,
+                        first_name,
+                        last_name,
+                        pwd: hash,
+                        category,
+                        institution,
+                        born_date,
+                        state,
+                        city,
+                        country,
+                        img_path: req.body.path_img
+                    }},(err, response) => {
+                        if(err){
+                            return res.status(500).send({error:err})
+                        } return res.status(200).send(response)
+                    })
+                
+                }
+            }
+        )
+    } else {
+        User.updateOne({email:OldEmail},{$set:{
+            email,
+            first_name,
+            last_name,
+            category,
+            institution,
+            born_date,
+            state,
+            city,
+            country
+        }},(err, response) => {
+            if(err){
+                return res.status(500).send({error:err})
+            } 
+            return res.status(200).json(response)
+            })
+        }
+    }
 }

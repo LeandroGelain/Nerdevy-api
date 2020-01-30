@@ -19,9 +19,12 @@ const UserSchema = new mongoose.Schema({
     },
     // adicionar esses campos que não tinha previsto
     friends:[String],
-    img: {
-        data: Buffer,
-        contentType: String
+    imgName : {
+        type: String,
+        default: "none",
+    },
+    imgData: {
+        type: String,
     },
     bio: String,
     gitLabProfile:String,
