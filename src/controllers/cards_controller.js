@@ -3,7 +3,7 @@ const User = require('../models/User');
 
 module.exports = {
     async store(req, res) {
-        const { title, category, points, description, email } = req.body;
+        const { title, category, points, description, email, username } = req.body;
         const  emailUser  = await User.findOne({email})
         if(emailUser){
             if (emailUser.email === email){
@@ -12,7 +12,7 @@ module.exports = {
                     category,
                     points,
                     description,
-                    created_by: email,
+                    created_by: username,
                     members : []
                 })
                 return res.status(200).send({message : `Card ${title} inserido`})
@@ -154,5 +154,25 @@ module.exports = {
         } else {
             return res.status(404).send({message: "Card não encontrado"})
         } 
-    }  
+    },
+    async FindByMember(req, res) {
+        const { email } = req.body;
+        await Card.find({},(err, doc) => {
+            if(err){
+                return res.status(500).send(err)
+            } 
+            const arrayCards = [];
+            for (const i in doc){
+                for (const j in doc[i].members){
+                    console.log(doc[i].members[j])
+                    if (email === doc[i].members[j]){
+                        arrayCards.push(doc[i])
+                    }
+                }
+            }
+            return res.status(200).send(arrayCards)
+        })
+        
+        // for ( const i in idCard)
+    }
 }        
