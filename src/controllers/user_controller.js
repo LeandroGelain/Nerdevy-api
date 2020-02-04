@@ -100,10 +100,12 @@ module.exports = {
                         state,
                         city,
                         country
-                    }},(err, response) => {
+                    }},(err, doc) => {
                         if(err){
                             return res.status(500).send({error:err})
-                        } return res.status(200).send(response)
+                        } else {
+                            return res.status(200).send({message:"editado"})
+                        }
                     })
                 }
             })
