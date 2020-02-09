@@ -11,162 +11,85 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema mydb
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `Nerdevy_database` DEFAULT CHARACTER SET utf8 ;
-USE `Nerdevy_database` ;
+CREATE SCHEMA IF NOT EXISTS `NerdevyDatabase` DEFAULT CHARACTER SET utf8 ;
+USE `NerdevyDatabase` ;
 
 -- -----------------------------------------------------
--- Table `Nerdevy_database`.`Users`
+-- Table `NerdevyDatabase`.`Friends`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Nerdevy_database`.`Users` (
+CREATE TABLE IF NOT EXISTS `NerdevyDatabase`.`Friends` (
+  `idFriends` INT NOT NULL,
+  `idUsersFriend` INT NOT NULL,
+  PRIMARY KEY (`idFriends`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `NerdevyDatabase`.`Users`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `NerdevyDatabase`.`Users` (
   `idUsers` INT NOT NULL AUTO_INCREMENT,
   `email` VARCHAR(45) NOT NULL,
   `username` VARCHAR(45) NOT NULL,
   `first_name` VARCHAR(45) NOT NULL,
   `last_name` VARCHAR(45) NOT NULL,
-  `pwd` VARCHAR(45) NOT NULL,
+  `pwd` LONGTEXT NOT NULL,
   `category` VARCHAR(45) NOT NULL,
   `institution` VARCHAR(45) NOT NULL,
-  `age` VARCHAR(45) NOT NULL,
+  `born_date` VARCHAR(45) NOT NULL,
   `city` VARCHAR(45) NOT NULL,
   `state` VARCHAR(45) NOT NULL,
   `country` VARCHAR(45) NOT NULL,
   `points_user` INT NOT NULL,
-  PRIMARY KEY (`idUsers`))
+  `created_date` VARCHAR(45) NOT NULL,
+  `img_path` MEDIUMTEXT NULL,
+  `bio` LONGTEXT NULL,
+  `gitlabProfile` VARCHAR(100) NULL,
+  `githubProfile` VARCHAR(100) NULL,
+  `Friends_idFriends` INT NULL,
+  PRIMARY KEY (`idUsers`),
+  UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE,
+  UNIQUE INDEX `username_UNIQUE` (`username` ASC) VISIBLE,
+  INDEX `fk_Users_Friends1_idx` (`Friends_idFriends` ASC) VISIBLE,
+  CONSTRAINT `fk_Users_Friends1`
+    FOREIGN KEY (`Friends_idFriends`)
+    REFERENCES `NerdevyDatabase`.`Friends` (`idFriends`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `Nerdevy_database`.`Challenges`
+-- Table `NerdevyDatabase`.`Cards`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Nerdevy_database`.`Challenges` (
-  `idChallenges` INT NOT NULL AUTO_INCREMENT,
-  `category_challenge` VARCHAR(45) NOT NULL,
+CREATE TABLE IF NOT EXISTS `NerdevyDatabase`.`Cards` (
+  `idCard` INT NOT NULL AUTO_INCREMENT,
+  `category` VARCHAR(45) NOT NULL,
   `title` VARCHAR(45) NOT NULL,
-  `description_challenge` VARCHAR(45) NOT NULL,
+  `description` VARCHAR(45) NOT NULL,
   `points` INT NOT NULL,
-  PRIMARY KEY (`idChallenges`))
+  `create_by` VARCHAR(200) NOT NULL,
+  PRIMARY KEY (`idCard`))
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `Nerdevy_database`.`Face_group`
+-- Table `mydb`.`MembersCard`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Nerdevy_database`.`Face_group` (
-  `idFace_group` INT NOT NULL AUTO_INCREMENT,
-  `date` VARCHAR(45) NOT NULL,
-  `theme` VARCHAR(45) NOT NULL,
-  `location` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idFace_group`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `Nerdevy_database`.`Users_has_Challenges`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Nerdevy_database`.`Users_has_Challenges` (
+CREATE TABLE IF NOT EXISTS `NerdevyDatabase`.`MembersCard` (
   `Users_idUsers` INT NOT NULL,
-  `Challenges_idChallenges` INT NOT NULL,
-  PRIMARY KEY (`Users_idUsers`, `Challenges_idChallenges`),
-  INDEX `fk_Users_has_Challenges_Challenges1_idx` (`Challenges_idChallenges` ASC) VISIBLE,
+  `Cards_idCard` INT NOT NULL,
+  PRIMARY KEY (`Users_idUsers`, `Cards_idCard`),
+  INDEX `fk_Users_has_Challenges_Challenges1_idx` (`Cards_idCard` ASC) VISIBLE,
   INDEX `fk_Users_has_Challenges_Users_idx` (`Users_idUsers` ASC) VISIBLE,
   CONSTRAINT `fk_Users_has_Challenges_Users`
     FOREIGN KEY (`Users_idUsers`)
-    REFERENCES `Nerdevy_database`.`Users` (`idUsers`)
+    REFERENCES `NerdevyDatabase`.`Users` (`idUsers`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Users_has_Challenges_Challenges1`
-    FOREIGN KEY (`Challenges_idChallenges`)
-    REFERENCES `Nerdevy_database`.`Challenges` (`idChallenges`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `Nerdevy_database`.`Users_has_Face_group`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Nerdevy_database`.`Users_has_Face_group` (
-  `Users_idUsers` INT NOT NULL,
-  `Face_group_idFace_group` INT NOT NULL,
-  PRIMARY KEY (`Users_idUsers`, `Face_group_idFace_group`),
-  INDEX `fk_Users_has_Face_group_Face_group1_idx` (`Face_group_idFace_group` ASC) VISIBLE,
-  INDEX `fk_Users_has_Face_group_Users1_idx` (`Users_idUsers` ASC) VISIBLE,
-  CONSTRAINT `fk_Users_has_Face_group_Users1`
-    FOREIGN KEY (`Users_idUsers`)
-    REFERENCES `Nerdevy_database`.`Users` (`idUsers`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Users_has_Face_group_Face_group1`
-    FOREIGN KEY (`Face_group_idFace_group`)
-    REFERENCES `Nerdevy_database`.`Face_group` (`idFace_group`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `Nerdevy_database`.`Call_group`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Nerdevy_database`.`Call_group` (
-  `idCall_group` INT NOT NULL AUTO_INCREMENT,
-  `date` VARCHAR(45) NOT NULL,
-  `theme` VARCHAR(45) NOT NULL,
-  `link` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idCall_group`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `Nerdevy_database`.`Competition_group`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Nerdevy_database`.`Competition_group` (
-  `idCompetition_group` INT NOT NULL AUTO_INCREMENT,
-  `theme` VARCHAR(45) NOT NULL,
-  `language` VARCHAR(45) NOT NULL,
-  `description` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idCompetition_group`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `Nerdevy_database`.`Users_has_Competition_group`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Nerdevy_database`.`Users_has_Competition_group` (
-  `Users_idUsers` INT NOT NULL,
-  `Competition_group_idCompetition_group` INT NOT NULL,
-  PRIMARY KEY (`Users_idUsers`, `Competition_group_idCompetition_group`),
-  INDEX `fk_Users_has_Competition_group_Competition_group1_idx` (`Competition_group_idCompetition_group` ASC) VISIBLE,
-  INDEX `fk_Users_has_Competition_group_Users1_idx` (`Users_idUsers` ASC) VISIBLE,
-  CONSTRAINT `fk_Users_has_Competition_group_Users1`
-    FOREIGN KEY (`Users_idUsers`)
-    REFERENCES `Nerdevy_database`.`Users` (`idUsers`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Users_has_Competition_group_Competition_group1`
-    FOREIGN KEY (`Competition_group_idCompetition_group`)
-    REFERENCES `Nerdevy_database`.`Competition_group` (`idCompetition_group`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `mydb`.`Users_has_Call_group`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Nerdevy_database`.`Users_has_Call_group` (
-  `Users_idUsers` INT NOT NULL,
-  `Call_group_idCall_group` INT NOT NULL,
-  PRIMARY KEY (`Users_idUsers`, `Call_group_idCall_group`),
-  INDEX `fk_Users_has_Call_group_Call_group1_idx` (`Call_group_idCall_group` ASC) VISIBLE,
-  INDEX `fk_Users_has_Call_group_Users1_idx` (`Users_idUsers` ASC) VISIBLE,
-  CONSTRAINT `fk_Users_has_Call_group_Users1`
-    FOREIGN KEY (`Users_idUsers`)
-    REFERENCES `Nerdevy_database`.`Users` (`idUsers`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Users_has_Call_group_Call_group1`
-    FOREIGN KEY (`Call_group_idCall_group`)
-    REFERENCES `Nerdevy_database`.`Call_group` (`idCall_group`)
+    FOREIGN KEY (`Cards_idCard`)
+    REFERENCES `NerdevyDatabase`.`Cards` (`idCard`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

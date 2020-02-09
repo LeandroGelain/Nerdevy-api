@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const CardsController = require('../controllers/cards_controller');
+const CardsController = require('../controllers/cardsController');
 
 router.post("/add", CardsController.insert_card_challenge);
 router.post("/delete",CardsController.delete_card_challenge);
