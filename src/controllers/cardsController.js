@@ -126,8 +126,8 @@ module.exports = {
                             return res.status(200).send(results)
                         }
                     }
-                    )
-                }
+                )
+            }
         })
     },
     // revisar
@@ -150,9 +150,9 @@ module.exports = {
             }
         })
     },
-    insert_member_on_card (req, res) {
+    async insert_member_on_card (req, res) {
         const { username, idCard } = req.body;
-        mysql.getConnection((err, conn) => {
+        await mysql.getConnection((err, conn) => {
             if(err){
                 return res.status(500).send({error:err})
             } conn.query(`select idUsers from users where username=?`,[username],(err, response) =>{
@@ -166,17 +166,17 @@ module.exports = {
                         [idUser, idCard], (error, responseInsert) => {
                             conn.release();
                             if (error) {
-                                console.log(error)
                                 if (error["errno"] === 1062) {
-                                    return res.status(500).send({message:"Usuario já faz parte do card."})
+                                    return res.status(200).send({message:"Usuario já faz parte do card."})
                                 }
                                 if (error["errno"] === 1452){
                                     return res.status(404).send({message:"Card não encontrado"})
                                 }
-                            } return res.status(200).send({message:`${username} inserido no card.`})
+                            } return res.status(200).send({message:"Membro inserido."})
                         } 
                     )
                 } else {
+                    conn.release();
                     return res.status(404).send({message:"Usuario não encontrado"})
                 }
             })
@@ -190,12 +190,14 @@ module.exports = {
             }
             conn.query(`select idUsers from users where username=?`,[username], (err, response)=> {
                 if (err) {
+                    conn.release()
                     return res.status(500).send({error:err})
                 }
                 if (response.length > 0 ){
                     const idUser = response[0]["idUsers"]
                     conn.query(`select * from membersCard where Users_idUsers=? and Cards_idCard=?`, [idUser, idCard], (err, resp) => {
                         if (err) {
+                            conn.release()
                             return res.status(500).send({error: err})
                         }
                         if (resp.length > 0) {
@@ -203,13 +205,53 @@ module.exports = {
                                 conn.release();
                                 if(err){
                                     return res.status(500).send({error: err})
-                                } return res.status(200).send({message: "Membro removido"})
+                                } return res.status(200).send({message: "Membro removido."})
                             })
                         } else {
+                            conn.release()
                             return res.status(200).send({message:"Membro não estava no card."})
                         }
                     })     
                 } else {
+                    conn.release()
+                    return res.status(404).send({message:"Membro não encontrado."})
+                }
+            })
+        })
+    },
+    findByMember(req, res) {
+        const { username } = req.body;
+        mysql.getConnection((err, conn) => {
+            if(err) {
+                return res.status(500).send({error:err})
+            }
+            conn.query(`select idUsers from users where username=?`, [username], (err, response) => {
+                if (err) {
+                    conn.release()
+                    return res.status(500).send({error:err})
+                }
+                if (response.length > 0) {
+                    const idUser = response[0]["idUsers"]
+                    conn.query(`select * from membersCard where Users_idUsers=?`, [idUser], (err, callback)=> {
+                        if(err) {
+                            conn.release()
+                            return res.status(500).send({error:err})
+                        } 
+                        var arrayIdCards = "("
+                        for (const i in callback){
+                            arrayIdCards = arrayIdCards.concat(callback[i]["Cards_idCard"],",")
+                        }
+                        arrayIdCards = arrayIdCards.substring(0,(arrayIdCards.length -1 )).concat(")")
+                        conn.query(`select * from cards where idCard in ${arrayIdCards}`, (err, resp) =>{
+                            conn.release()
+                            if(err){
+                                return res.status(500).send({error:err})
+                            } 
+                            return res.status(200).send(resp)
+                        })
+                    })
+                } else {
+                    conn.release()
                     return res.status(404).send({message:"Membro não encontrado."})
                 }
             })

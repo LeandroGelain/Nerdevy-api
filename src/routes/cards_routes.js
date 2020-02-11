@@ -9,5 +9,6 @@ router.post('/listLimit', CardsController.get_cards);
 router.post('/findById', CardsController.get_card_by_id);
 router.post('/insertMember',CardsController.insert_member_on_card);
 router.post('/removeMember', CardsController.removeMember);
+router.post('/findByMember', CardsController.findByMember);
 
 module.exports = router;

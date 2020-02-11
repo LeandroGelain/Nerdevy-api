@@ -24,7 +24,7 @@ module.exports = {
                         } else {
                             conn.query(
                                 `insert into users 
-                                (email, username, first_name, last_name, pwd, category, institution ,age, city, state, country, points_user, created_date, img_path)`
+                                (email, username, first_name, last_name, pwd, category, institution ,born_date, city, state, country, points_user, created_date, img_path)`
                                 + `values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)`, 
                                 [
                                     req.body.email,
@@ -34,7 +34,7 @@ module.exports = {
                                     hash,
                                     req.body.category,
                                     req.body.institution,
-                                    req.body.age,
+                                    req.body.born_date,
                                     req.body.city,
                                     req.body.state,
                                     req.body.country,
@@ -133,7 +133,7 @@ module.exports = {
                     err : err
                 })
             } else {
-                conn.query(`select * from users where email=?`,req.body.email, 
+                conn.query(`select * from users where username=?`,req.body.username, 
                 (error, results, fields) => {
                     conn.release();
                     if (error) {
@@ -143,7 +143,7 @@ module.exports = {
                         return res.status(404).send({ message: 'Usuario não existe'})
                     }
                     else {
-                        return res.status(201).send({ results: results})
+                        return res.status(201).send(results)
                     }
                 })
             }
