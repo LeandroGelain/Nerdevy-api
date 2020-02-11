@@ -66,9 +66,9 @@ CREATE TABLE IF NOT EXISTS `NerdevyDatabase`.`Cards` (
   `idCard` INT NOT NULL AUTO_INCREMENT,
   `category` VARCHAR(45) NOT NULL,
   `title` VARCHAR(45) NOT NULL,
-  `description` VARCHAR(45) NOT NULL,
+  `description` LONGTEXT NOT NULL,
   `points` INT NOT NULL,
-  `create_by` VARCHAR(200) NOT NULL,
+  `created_by` VARCHAR(200) NOT NULL,
   PRIMARY KEY (`idCard`))
 ENGINE = InnoDB;
 
